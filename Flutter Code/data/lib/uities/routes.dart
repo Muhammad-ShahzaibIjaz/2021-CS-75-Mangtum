@@ -3,4 +3,6 @@ class MyRoutes {
   static String homeRoute = "/HomePage";
   static String SignInRoute = "/SignInPage";
   static String ForgotPassRoute = "/ForgotPassPage";
+    static String renderHomeRoute = "/RenderHomePage";
+
 }
