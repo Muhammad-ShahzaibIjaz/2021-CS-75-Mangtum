@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mangtumcode/Widgets/OrderHistoryPage.dart';
+import 'package:mangtumcode/pages/UpadteProfilePage.dart';
 
 class MyDrawerBuyer extends StatelessWidget {
   final String name;
@@ -34,23 +35,10 @@ class MyDrawerBuyer extends StatelessWidget {
                 textScaleFactor: 1.2,
                 style: TextStyle(color: Colors.amber),
               ),
-              currentAccountPicture: Image.asset("Assets/images/MangtumLogo.png"),
+              currentAccountPicture:
+                  Image.asset("Assets/images/MangtumLogo.png"),
               decoration: BoxDecoration(color: Colors.white),
             ),
-          ),
-          ListTile(
-            leading: Icon(
-              CupertinoIcons.home,
-              color: Colors.amber,
-            ),
-            title: Text(
-              "Home",
-              textScaleFactor: 1.2,
-              style: TextStyle(color: Colors.amber),
-            ),
-            onTap: () {
-              // Navigate to Home page
-            },
           ),
           ListTile(
             leading: Icon(
@@ -63,7 +51,12 @@ class MyDrawerBuyer extends StatelessWidget {
               style: TextStyle(color: Colors.amber),
             ),
             onTap: () {
-              // Navigate to Profile page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdateProfilePage(userId: userId),
+                ),
+              );
             },
           ),
           ListTile(

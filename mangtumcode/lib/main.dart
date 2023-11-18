@@ -13,7 +13,6 @@ import 'package:mangtumcode/pages/PaymentMethod.dart';
 import 'package:mangtumcode/pages/RenderHomePage.dart';
 import 'package:mangtumcode/pages/SignUpPage.dart';
 import 'package:mangtumcode/uities/routes.dart';
-import 'pages/AuthPage.dart'; // Import GetX
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +46,7 @@ class MyApp extends StatelessWidget {
         MyRoutes.RenderPage: (context) => RenderHomePage(),
         MyRoutes.AddProductPage: (context) => AddProductPage(),
         MyRoutes.PaymentMethodPage: (context) => PaymentMethodPage(),
-        MyRoutes.AdminHomePage:(context)=>AdminDashboardPage(),
+        MyRoutes.AdminHomePage: (context) => AdminDashboardPage(),
       },
     );
   }

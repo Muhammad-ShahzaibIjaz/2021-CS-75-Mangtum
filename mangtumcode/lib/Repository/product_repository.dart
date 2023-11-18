@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mangtumcode/models/payment_model.dart';
 
 class ProductRepository {
   final CollectionReference _productCollection =

@@ -71,19 +71,15 @@ class _LoginPageState extends State<LoginPage> {
       });
       print('Firebase Authentication Error: ${e.code}');
       if (e.code == 'user-not-found') {
-        if (context != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("No user found for that email."),
-            ),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("No user found for that email."),
+          ),
+        );
       } else if (e.code == 'wrong-password') {
-        if (context != null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Wrong password provided for that user.'),
-          ));
-        }
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Wrong password provided for that user.'),
+        ));
       }
     }
   }

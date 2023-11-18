@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:mangtumcode/models/users_model.dart';
 
@@ -19,6 +17,7 @@ class UserRepository extends GetxController {
               snackPosition: SnackPosition.BOTTOM,
               backgroundColor: Colors.amber,
             ))
+        // ignore: body_might_complete_normally_catch_error
         .catchError((error, StackTrace) {
       Get.snackbar(
         "Error",

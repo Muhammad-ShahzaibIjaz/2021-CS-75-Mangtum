@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mangtumcode/Widgets/drawer.dart';
-import 'package:mangtumcode/uities/routes.dart';
 
 class RenderProductPage extends StatefulWidget {
   final String productId;

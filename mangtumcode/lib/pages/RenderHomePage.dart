@@ -1,5 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mangtumcode/Refrences/userRef.dart';
@@ -7,7 +5,6 @@ import 'package:mangtumcode/Widgets/drawer.dart';
 import 'package:mangtumcode/pages/AddProductPage.dart';
 import 'package:mangtumcode/pages/PaymentMethod.dart';
 import 'package:mangtumcode/pages/RenderProductPage.dart';
-import 'package:mangtumcode/pages/SignUpPage.dart';
 import 'package:mangtumcode/uities/routes.dart';
 
 class RenderHomePage extends StatelessWidget {
@@ -82,6 +79,7 @@ class RenderHomePage extends StatelessWidget {
           drawer: MyDrawer(
             name: userData['name'] ?? 'Name not found',
             email: userData['email'] ?? 'Email not found',
+            userId: userId,
           ),
           body: buildProductListView(userId),
         );

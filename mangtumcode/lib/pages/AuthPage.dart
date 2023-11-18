@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mangtumcode/pages/HomePage.dart';
 import 'package:mangtumcode/pages/LoginPage.dart';
 import 'package:mangtumcode/pages/SignUpPage.dart';
 
