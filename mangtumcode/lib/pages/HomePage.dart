@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mangtumcode/Refrences/userRef.dart';
-import 'package:mangtumcode/Widgets/drawer.dart';
+import 'package:mangtumcode/Widgets/MyDrawerBuyer.dart';
 import 'package:mangtumcode/pages/CartPage.dart';
 import 'package:mangtumcode/pages/ProductDetailPage.dart';
-import 'package:mangtumcode/pages/RenderProductPage.dart';
 import 'package:mangtumcode/pages/WishlistPage.dart';
 
 class HomePage extends StatelessWidget {
@@ -80,9 +78,10 @@ class HomePage extends StatelessWidget {
             ),
           ),
           body: buildProductListView(userId),
-          drawer: MyDrawer(
+          drawer: MyDrawerBuyer(
             name: userData['name'] ?? 'Name not found',
             email: userData['email'] ?? 'Email not found',
+            userId: userId,
           ),
         );
       },

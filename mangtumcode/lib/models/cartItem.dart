@@ -12,20 +12,24 @@ class CartItem {
     required this.productName,
     required this.productPrice,
     required this.productImageUrl,
-  }) : this.quantity = 1;
+    this.quantity = 1,
+  });
 
   // Factory constructor to create a CartItem from a Firestore snapshot
   factory CartItem.fromSnapshot(
-      QueryDocumentSnapshot<Map<String, dynamic>> CartDoc,
-      DocumentSnapshot<Map<String, dynamic>> ProductsDoc) {
+    QueryDocumentSnapshot<Map<String, dynamic>> cartDoc,
+    DocumentSnapshot<Map<String, dynamic>> productDoc,
+  ) {
     return CartItem(
-      productId: CartDoc['productId'],
-      productName: ProductsDoc['productName'],
-      productPrice: ProductsDoc['price'].toDouble(),
-      productImageUrl: ProductsDoc['imageUrl'],
+      productId: cartDoc['productId'],
+      productName: productDoc['productName'],
+      productPrice: productDoc['price'].toDouble(),
+      productImageUrl: productDoc['imageUrl'],
+      quantity: cartDoc['quantity'] ?? 1,
     );
   }
-    Map<String, dynamic> toMap() {
+
+  Map<String, dynamic> toMap() {
     return {
       'productId': productId,
       'productName': productName,
@@ -34,6 +38,16 @@ class CartItem {
       'productImageUrl': productImageUrl,
       // Add any other fields you need
     };
+  }
+
+  factory CartItem.fromMap(Map<String, dynamic> map) {
+    return CartItem(
+      productId: map['productId'],
+      productName: map['productName'],
+      productPrice: (map['productPrice'] ?? 0.0).toDouble(),
+      quantity: map['quantity'] ?? 1,
+      productImageUrl: map['productImageUrl'],
+    );
   }
 }
 
