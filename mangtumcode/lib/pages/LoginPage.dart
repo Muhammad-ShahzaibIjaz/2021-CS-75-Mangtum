@@ -55,6 +55,12 @@ class _LoginPageState extends State<LoginPage> {
           MyRoutes.homeRoute,
           arguments: {'userId': userUid}, // Pass the userId here
         );
+      } else if (userRole == 'Admin') {
+        Navigator.pushNamed(
+          context,
+          MyRoutes.homeRoute,
+          arguments: {'userId': userUid}, // Pass the userId here
+        );
       } else {
         // Handle other roles or scenarios here
       }

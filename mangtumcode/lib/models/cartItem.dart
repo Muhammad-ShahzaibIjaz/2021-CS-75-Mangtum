@@ -25,6 +25,16 @@ class CartItem {
       productImageUrl: ProductsDoc['imageUrl'],
     );
   }
+    Map<String, dynamic> toMap() {
+    return {
+      'productId': productId,
+      'productName': productName,
+      'productPrice': productPrice,
+      'quantity': quantity,
+      'productImageUrl': productImageUrl,
+      // Add any other fields you need
+    };
+  }
 }
 
 class CartService {

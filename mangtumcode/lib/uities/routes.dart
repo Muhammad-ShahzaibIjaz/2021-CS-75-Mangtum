@@ -8,4 +8,5 @@ class MyRoutes {
   static String RenderPage = "/RenderHomePage";
   static String PaymentMethodPage = "/PaymentMethodPage";
   static String AddProductPage = "/AddProductPage";
+  static String AdminHomePage = "/AdminDashboardPage";
 }

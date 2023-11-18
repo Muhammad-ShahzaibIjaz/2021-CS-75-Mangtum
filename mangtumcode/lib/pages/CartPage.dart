@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:mangtumcode/models/cartItem.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'dart:io';
-import 'package:google_fonts/google_fonts.dart' as fonts;
 
 class CartPage extends StatefulWidget {
   final String userId;
@@ -160,13 +156,87 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
+  Future<void> _showBillDialog(List<CartItem> cartItems, double total) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Bill Details'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var item in cartItems)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Product: ${item.productName}'),
+                    Text('Price: \$${item.productPrice}'),
+                    Text('Quantity: ${item.quantity}'),
+                    Divider(),
+                  ],
+                ),
+              Text('Total: \$${total}'),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _saveOrderHistory(List<CartItem> cartItems, double total) async {
+    try {
+      final historyRef = FirebaseFirestore.instance.collection('OrderHistory');
+
+      await historyRef.add({
+        'userId': widget.userId,
+        'cartItems': cartItems.map((item) => item.toMap()).toList(),
+        'totalAmount': total,
+        'created_at': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error saving order history: $e');
+      // Handle the error accordingly.
+    }
+  }
+
+  Future<String?> getUserEmailFromUserId(String userId) async {
+    try {
+      // Assuming you have a Firestore collection named 'users'
+      // with documents containing 'userId' and 'email' fields
+      var userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        return userDoc.data()?['email'];
+      } else {
+        print('User document not found for userId: $userId');
+        return null;
+      }
+    } catch (e) {
+      print('Error retrieving user email: $e');
+      return null;
+    }
+  }
+
   void _checkout() async {
     try {
+      // 3. Save Order History
+      await _saveOrderHistory(cartItems, _calculateTotal());
       // 1. Generate Bill Report
-      //await _generateBillReport(cartItems, _calculateTotal());
+      await _showBillDialog(cartItems, _calculateTotal());
       // 2. Update Product Quantities
       await _updateProductQuantities(cartItems);
-
       // Optionally, you can navigate to a success page or show a success message.
     } catch (e) {
       print('Error during checkout: $e');

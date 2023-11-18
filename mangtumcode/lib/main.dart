@@ -5,6 +5,7 @@ import 'package:mangtumcode/Repository/user_repository.dart';
 import 'package:mangtumcode/Widgets/themes.dart';
 import 'package:mangtumcode/firebase_options.dart';
 import 'package:mangtumcode/pages/AddProductPage.dart';
+import 'package:mangtumcode/pages/AdminDashboardPage.dart';
 import 'package:mangtumcode/pages/ForgotPassPage.dart';
 import 'package:mangtumcode/pages/HomePage.dart';
 import 'package:mangtumcode/pages/LoginPage.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         MyRoutes.RenderPage: (context) => RenderHomePage(),
         MyRoutes.AddProductPage: (context) => AddProductPage(),
         MyRoutes.PaymentMethodPage: (context) => PaymentMethodPage(),
+        MyRoutes.AdminHomePage:(context)=>AdminDashboardPage(),
       },
     );
   }
