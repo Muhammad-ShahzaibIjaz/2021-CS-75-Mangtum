@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mangtumcode/Refrences/userRef.dart';
 import 'package:mangtumcode/Widgets/drawer.dart';
 import 'package:mangtumcode/pages/AddProductPage.dart';
 import 'package:mangtumcode/pages/PaymentMethod.dart';
 import 'package:mangtumcode/pages/RenderProductPage.dart';
 import 'package:mangtumcode/uities/routes.dart';
 
-class RenderHomePage extends StatelessWidget {
+class RenderHomePage extends StatefulWidget {
   final String userId;
 
   RenderHomePage({Key? key, String? userId})
@@ -22,19 +21,45 @@ class RenderHomePage extends StatelessWidget {
   }
 
   @override
+  _RenderHomePageState createState() => _RenderHomePageState();
+}
+
+class _RenderHomePageState extends State<RenderHomePage> {
+  late TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  Future<Map<String, dynamic>?> getNameAndEmailByUidSync(String? userId) async {
+    if (userId == null || userId.isEmpty) {
+      return null;
+    }
+    try {
+      DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
+          .instance
+          .collection('Users')
+          .doc(userId)
+          .get();
+      return userDoc.data();
+    } catch (e) {
+      print('Error getting name and email by UID: $e');
+      return null;
+    }
+  }
+
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    // Check if args is not null before accessing userId
     final userId = args?['userId'];
     return FutureBuilder<Map<String, dynamic>?>(
       future: getNameAndEmailByUidSync(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // While waiting for data, you can show a loading indicator
           return CircularProgressIndicator();
         } else if (snapshot.hasError || !snapshot.hasData) {
-          // Handle errors or when data is not available
           return Center(child: Text('Error fetching user data'));
         }
 
@@ -81,7 +106,14 @@ class RenderHomePage extends StatelessWidget {
             email: userData['email'] ?? 'Email not found',
             userId: userId,
           ),
-          body: buildProductListView(userId),
+          body: Column(
+            children: [
+              buildSearchBar(),
+              Expanded(
+                child: buildProductListView(userId),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -99,112 +131,133 @@ class RenderHomePage extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-          // User has products
-          // Build and return a widget to display the products here
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              final productData = snapshot.data!.docs[index];
-              final productId = productData.id;
-              final productName = productData['productName'];
-              final productPrice = productData['price'].toString();
-              final imageUrl = productData['imageUrl'];
-              final productDescription = productData['description'];
-              return GestureDetector(
-                  onTap: () {
-                    // Navigate to another page with detailed product information
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RenderProductPage(productId),
-                      ),
-                    );
-                  },
-                  child: Container(
-                      margin: EdgeInsets.all(8), // Adjust the margin as needed
-                      padding:
-                          EdgeInsets.all(8), // Adjust the padding as needed
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Colors.grey), // Add border to the container
-                        borderRadius: BorderRadius.circular(
-                            8), // Add border radius to the container
-                      ),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(
-                            16), // Adjust the overall padding of the ListTile
-                        title: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width:
-                                  80, // Adjust the width of the image container
-                              height:
-                                  80, // Adjust the height of the image container
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                    8), // Adjust the border radius as needed
-                                child: Image.network(
-                                  imageUrl,
-                                  fit: BoxFit.cover,
+          List<DocumentSnapshot> filteredProducts = snapshot.data!.docs
+              .where((product) => product['productName']
+                  .toString()
+                  .toLowerCase()
+                  .contains(_searchController.text.toLowerCase()))
+              .toList();
+
+          if (filteredProducts.isNotEmpty) {
+            return ListView.builder(
+              itemCount: filteredProducts.length,
+              itemBuilder: (context, index) {
+                final productData = filteredProducts[index];
+                final productId = productData.id;
+                final productName = productData['productName'];
+                final productPrice = productData['price'].toString();
+                final imageUrl = productData['imageUrl'];
+                final productDescription = productData['description'];
+                return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RenderProductPage(productId),
+                        ),
+                      );
+                    },
+                    child: Container(
+                        margin: EdgeInsets.all(8),
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.all(16),
+                          title: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 80,
+                                height: 80,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    imageUrl,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                                width:
-                                    16), // Adjust the spacing between the image and text
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    productName,
-                                    style: TextStyle(
-                                      fontSize:
-                                          18, // Adjust the font size of the product name
-                                      fontWeight: FontWeight
-                                          .bold, // Adjust the font weight as needed
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      productName,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    productDescription,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
+                                    SizedBox(height: 8),
+                                    Text(
+                                      productDescription,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                      height:
-                                          8), // Adjust the spacing between product name and price
-                                  Text(
-                                    'Price: \$${productPrice}', // Format the price as needed
-                                    style: TextStyle(color: Colors.amber),
-                                  ),
-                                ],
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Price: \$${productPrice}',
+                                      style: TextStyle(color: Colors.amber),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      )));
-            },
-          );
+                            ],
+                          ),
+                        )));
+              },
+            );
+          } else {
+            return _buildNoProductsFoundScreen();
+          }
         } else {
-          // User has no products
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'LET\'S START / ENDL ENTER NEW PRODUCT NOW',
-                  style: TextStyle(fontSize: 18),
-                ),
-                // Add any other widgets or buttons as needed
-              ],
-            ),
-          );
+          return _buildNoProductsFoundScreen();
         }
       },
+    );
+  }
+
+  Widget buildSearchBar() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (value) {
+          setState(() {});
+        },
+        decoration: InputDecoration(
+          hintText: 'Search',
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingScreen() {
+    return Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildNoProductsFoundScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'LET\'S START / ENDL ENTER NEW PRODUCT NOW',
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
     );
   }
 }

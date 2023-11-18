@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mangtumcode/Refrences/roleRef.dart';
+import 'package:mangtumcode/pages/HomePage.dart';
 import 'package:mangtumcode/uities/routes.dart';
 
 class LoginPage extends StatefulWidget {
@@ -50,10 +51,11 @@ class _LoginPageState extends State<LoginPage> {
           arguments: {'userId': userUid}, // Pass the userId here
         );
       } else if (userRole == 'Buyer') {
-        Navigator.pushNamed(
+        Navigator.push(
           context,
-          MyRoutes.homeRoute,
-          arguments: {'userId': userUid}, // Pass the userId here
+          MaterialPageRoute(
+            builder: (context) => HomePage.create(userId: userUid),
+          ),
         );
       } else if (userRole == 'Admin') {
         Navigator.pushNamed(
