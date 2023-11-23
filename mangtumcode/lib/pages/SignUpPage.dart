@@ -1,12 +1,10 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mangtumcode/Refrences/roleRef.dart';
-import 'package:mangtumcode/Widgets/google.dart';
 import 'package:mangtumcode/models/users_model.dart';
+import 'package:mangtumcode/pages/LoginPage.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -20,13 +18,27 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-  TextEditingController _phoneNumberController =
-      TextEditingController(); // Add phone number controller
+  TextEditingController _phoneNumberController = TextEditingController();
   String? _selectedRole;
+  String? _emailError;
+  String? _nameError;
+  String? _phoneError;
+  String? _passwordError;
+  String? _roleError;
+
   final List<String> roleOptions = ["Admin", "Buyer", "Render"];
-  Completer<void> _googleSignInCompleter = Completer<void>();
-  //sign up
+
   Future<void> signUp() async {
+    setState(() {
+      _nameError = _nameController.text.isEmpty ? 'Name is required' : null;
+      _emailError = _emailController.text.isEmpty ? 'Email is required' : null;
+      _passwordError =
+          _passwordController.text.isEmpty ? 'Password is required' : null;
+      _phoneError =
+          _phoneNumberController.text.isEmpty ? 'Phone is required' : null;
+      _roleError = _selectedRole == null ? 'Role is required' : null;
+    });
+
     final FirebaseAuth _auth = FirebaseAuth.instance;
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -39,30 +51,26 @@ class _SignInPageState extends State<SignInPage> {
       } else if (_selectedRole == "Buyer") {
         roleRef = userRoleBuyer;
       }
-      print("_selectedRole= $_selectedRole");
-      print("roleref= $roleRef");
+
       try {
-        // Sign up the user with email and password
         final userCredential = await _auth.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
         if (userCredential.user != null) {
-          // Send email verification
           await userCredential.user!.sendEmailVerification();
 
-          // Create a Users object
           final user = Users(
-              userEmail: _emailController.text,
-              userPassword: _passwordController.text,
-              userPhone: _phoneNumberController.text,
-              name: _nameController.text,
-              userRole: roleRef,
-              isActive: true,
-              created_at: Timestamp.now());
+            userEmail: _emailController.text,
+            userPassword: _passwordController.text,
+            userPhone: _phoneNumberController.text,
+            name: _nameController.text,
+            userRole: roleRef,
+            isActive: true,
+            created_at: Timestamp.now(),
+          );
 
-          // Store user data in Firestore
           await _firestore
               .collection('Users')
               .doc(userCredential.user!.uid)
@@ -75,258 +83,207 @@ class _SignInPageState extends State<SignInPage> {
             'isActive': true,
             'created_at': Timestamp.now(),
             'updated_at': Timestamp.now(),
-            'emailVerified': false, // Initialize emailVerified to false
+            'emailVerified': false,
           });
 
-          // User signed up successfully
           print("User signed up: ${userCredential.user?.uid}");
-
-          // You can now inform the user that a verification email has been sent
-          // and they need to verify their email before they can log in.
-          // You may also provide a way for them to request a new verification email if needed.
         }
       } catch (e) {
-        // Handle signup error
         print("Error signing up: $e");
-        // You can also display an error message to the user here
       }
-    }
-  }
-
-// ...
-
-// Sign up with Google
-  Future<void> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    if (googleUser == null) {
-      // The user canceled the sign-in process
-      _googleSignInCompleter.completeError('Sign-in canceled');
-      return;
-    }
-
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    try {
-      final UserCredential authResult =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-      final User? user = authResult.user;
-
-      if (user != null) {
-        // Handle successful Google sign-in
-        _googleSignInCompleter.complete();
-        print("DONE");
-        // You can navigate to another screen or perform other actions here
-      } else {
-        _googleSignInCompleter.completeError('Sign-in failed');
-      }
-    } catch (e) {
-      print('$e');
-      _googleSignInCompleter.completeError(e.toString());
+    } else {
+      print("ACHA");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Sign Up'), // Add app bar title
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back), // Add back arrow
-            onPressed: () {
-              Navigator.of(context).pop(); // Navigate back
-            },
-          ),
-        ),
-        body: Material(
-          color: Colors.white,
-          child: SingleChildScrollView(
-            child: Form(
+      body: Material(
+        color: Colors.white,
+        child: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          children: [
+            Form(
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 40.0,
+              child: Container(
+                width: double.infinity,
+                height: 800.0,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(16.0),
+                    bottomRight: Radius.circular(16.0),
                   ),
-                  Image.asset(
-                    "Assets/images/MangtumLogo.png",
-                    fit: BoxFit.cover,
-                    height: 150.0,
-                  ),
-                  SizedBox(
-                    height: 40.0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        hintText: "Name",
-                        labelText: "Name",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person_outline_rounded),
+                  border: Border.all(color: Colors.grey),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 0.0),
+                            child: Image.asset(
+                              'assets/images/MangtumLogo.png',
+                              width: 200.0,
+                              height: 60.0,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                        ],
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Name is required";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0, // Set the distance between fields
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        hintText: "Email",
-                        labelText: "Email",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Email is required";
-                        } else if (!value.contains('@')) {
-                          return "Enter a valid email";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0, // Set the distance between fields
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: TextFormField(
-                      controller:
-                          _phoneNumberController, // Add phone number controller
-                      decoration: InputDecoration(
-                        hintText: "Phone Number",
-                        labelText: "Phone Number",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.phone_android_outlined),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Phone number is required";
-                        } else if (!value.startsWith("03") ||
-                            value.length != 11) {
-                          return "Enter a valid phone number starting with '03' and having a total of 11 characters";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0, // Set the distance between fields
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: "Password",
-                        labelText: "Password",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.password_outlined),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Password is required";
-                        } else if (value.length < 8 ||
-                            !value.contains(RegExp(r'[0-9]'))) {
-                          return "Password must be at least 8 characters and contain at least one numeric character";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0, // Set the distance between fields
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: DropdownButtonFormField(
-                      value: _selectedRole,
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedRole = newValue as String?;
-                        });
-                      },
-                      items: roleOptions.map((role) {
-                        return DropdownMenuItem(
-                          value: role,
-                          child: Text(role),
-                        );
-                      }).toList(),
-                      decoration: InputDecoration(
-                        hintText: "Role",
-                        labelText: "Role",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.query_stats_outlined),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Role is required";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      signUp();
-                    },
-                    child: Container(
-                      width: 150,
-                      height: 40,
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Create a new Account",
+                      SizedBox(height: 16.0),
+                      Text(
+                        'Get Started Below,',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontFamily: 'Roboto',
                         ),
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.circular(8),
+                      SizedBox(height: 10.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          controller: _nameController,
+                          decoration: InputDecoration(
+                            hintText: "Name",
+                            labelText: "Name",
+                            errorText: _nameError,
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.person_outline_rounded),
+                          ),
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 15.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            hintText: "Email",
+                            labelText: "Email",
+                            errorText: _emailError,
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.email_outlined),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          controller: _phoneNumberController,
+                          decoration: InputDecoration(
+                            hintText: "Phone Number",
+                            labelText: "Phone Number",
+                            errorText: _phoneError,
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.phone_android_outlined),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            hintText: "Password",
+                            labelText: "Password",
+                            errorText: _passwordError,
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.password_outlined),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: DropdownButtonFormField(
+                          value: _selectedRole,
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedRole = newValue as String?;
+                            });
+                          },
+                          items: roleOptions.map((role) {
+                            return DropdownMenuItem(
+                              value: role,
+                              child: Text(role),
+                            );
+                          }).toList(),
+                          decoration: InputDecoration(
+                            hintText: "Role",
+                            labelText: "Role",
+                            errorText: _roleError,
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.query_stats_outlined),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 200,
+                            height: 40,
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Already have an account? Login",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.0),
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            signUp();
+                          },
+                          child: Container(
+                            width: 150,
+                            height: 40,
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Create your account",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.amber,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  GoogleSignInButton(
-                    onPressed: () async {
-                      await signInWithGoogle();
-                      try {
-                        await _googleSignInCompleter.future;
-                        // Continue with other actions after successful Google sign-in
-                      } catch (e) {
-                        // Handle errors or canceled sign-in
-                      }
-                    },
-                  )
-                ],
+                ),
               ),
             ),
-          ),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -45,38 +45,47 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Forgot Password'),
+        title: Text('Change Password'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Enter your email',
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 20),
+            Text('Email Address'),
             TextField(
-              controller: _emailController, // Use _emailController here
-              keyboardType: TextInputType.emailAddress,
+              controller: _emailController,
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.email_outlined),
-                labelText: 'Email',
-                errorText: _emailError,
-                border: OutlineInputBorder(),
+                hintText: 'Enter your email address',
+                errorText: _emailError, // Add a comma here
               ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _resetPassword,
-              child: Text(
-                'Reset Password',
-                style: TextStyle(color: Colors.white),
-              ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Colors.amber),
+            SizedBox(
+              height: 8.0,
+            ),
+            Text(
+              'We will send you an email with a link to reset your password. Please enter the email associated with your account above.',
+              style: TextStyle(fontSize: 14.0, color: Colors.grey),
+            ),
+            SizedBox(height: 16.0),
+            Center(
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.amber),
+                    foregroundColor: MaterialStateProperty.all(
+                        Colors.white), // Set text color to white
+                  ),
+                  onPressed: _resetPassword,
+                  child: Text('Send Reset Link'),
+                ),
               ),
             ),
           ],
