@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mangtumcode/uities/routes.dart';
 
 class UpdateProfilePage extends StatefulWidget {
   final String userId;
@@ -72,11 +73,18 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Update Profile'),
+        title: Text(
+          'Update Profile',
+          style: TextStyle(color: Colors.white),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pushNamed(
+              context,
+              MyRoutes.RenderEntryPage,
+              arguments: {'userId': widget.userId}, // Pass the userId here
+            );
           },
         ),
       ),

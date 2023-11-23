@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushNamed(
           context,
 
-          MyRoutes.RenderPage,
+          MyRoutes.RenderEntryPage,
 
           arguments: {'userId': userUid}, // Pass the userId here
         );

@@ -11,12 +11,12 @@ class RenderProductPage extends StatefulWidget {
 }
 
 class _RenderProductPageState extends State<RenderProductPage> {
-  late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _priceController;
-  late TextEditingController _quantityController;
-  late TextEditingController _thresholdController;
-  late String _imageUrl;
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _priceController = TextEditingController();
+  TextEditingController _quantityController = TextEditingController();
+  TextEditingController _thresholdController = TextEditingController();
+  String? _imageUrl;
 
   @override
   void initState() {
@@ -73,7 +73,10 @@ class _RenderProductPageState extends State<RenderProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Product'),
+        title: Text(
+          'Edit Product',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.amber,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -82,53 +85,61 @@ class _RenderProductPageState extends State<RenderProductPage> {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.network(_imageUrl, height: 200, width: 200),
-            SizedBox(height: 8),
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Product Name',
-                border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16),
+              Center(
+                child: _imageUrl != null && _imageUrl!.isNotEmpty
+                    ? Image.network(_imageUrl!, height: 200, width: 200)
+                    : Text('Image not available'),
               ),
-            ),
-            SizedBox(height: 8),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Product Name',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 8),
-            TextFormField(
-              controller: _priceController,
-              decoration: InputDecoration(
-                labelText: 'Price',
-                border: OutlineInputBorder(),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 8),
-            TextFormField(
-              controller: _quantityController,
-              decoration: InputDecoration(
-                labelText: 'Quantity',
-                border: OutlineInputBorder(),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: _priceController,
+                decoration: InputDecoration(
+                  labelText: 'Price',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 8),
-            TextFormField(
-              controller: _thresholdController,
-              decoration: InputDecoration(
-                labelText: 'Threshold',
-                border: OutlineInputBorder(),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: _quantityController,
+                decoration: InputDecoration(
+                  labelText: 'Quantity',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: 8),
+              TextFormField(
+                controller: _thresholdController,
+                decoration: InputDecoration(
+                  labelText: 'Threshold',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
       floatingActionButton: Padding(
@@ -141,16 +152,38 @@ class _RenderProductPageState extends State<RenderProductPage> {
                 // Add logic to delete the product here
                 _deleteProduct();
               },
-              child: Icon(Icons.delete),
-              backgroundColor: Colors.amber,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white, // Set the desired background color
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Icon(
+                    Icons.delete,
+                    color: Colors.amber, // Set the desired icon color
+                  ),
+                ),
+              ),
             ),
             SizedBox(width: 16),
             FloatingActionButton(
               onPressed: () {
                 _updateProduct();
               },
-              child: Icon(Icons.save),
-              backgroundColor: Colors.amber,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white, // Set the desired background color
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Icon(
+                    Icons.save,
+                    color: Colors.amber, // Set the desired icon color
+                  ),
+                ),
+              ),
             ),
           ],
         ),

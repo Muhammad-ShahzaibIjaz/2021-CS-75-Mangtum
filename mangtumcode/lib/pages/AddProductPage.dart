@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:mangtumcode/uities/routes.dart';
 
 class AddProductPage extends StatelessWidget {
   final String? userId;
@@ -12,14 +13,28 @@ class AddProductPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Product'),
+        title: Text(
+          'Add Product',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.amber,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              MyRoutes.RenderEntryPage,
+              arguments: {'userId': userId}, // Pass the userId here
+            );
+          },
+        ),
       ),
       body: FutureBuilder<String?>(
         future: getPaymentId(userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // Display a loading indicator.
+            return CircularProgressIndicator(
+                color: Colors.amber); // Display a loading indicator.
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}'); // Handle errors if any.
           } else {
@@ -102,18 +117,6 @@ class _AddProductFormState extends State<AddProductForm> {
           key: _formKey,
           child: Column(
             children: <Widget>[
-              Icon(
-                Icons.add_a_photo,
-                size: 80,
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Add a new product',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               SizedBox(height: 20),
               TextFormField(
                 controller: _productNameController,
@@ -217,6 +220,7 @@ class _AddProductFormState extends State<AddProductForm> {
                   Text('Active: '),
                   Switch(
                     value: _isActive,
+                    activeColor: Colors.amber,
                     onChanged: (value) {
                       setState(() {
                         _isActive = value;
@@ -257,6 +261,10 @@ class _AddProductFormState extends State<AddProductForm> {
                     }
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.amber, // Background color
+                  onPrimary: Colors.white, // Text color
+                ),
                 child: Text('Submit'),
               ),
             ],
