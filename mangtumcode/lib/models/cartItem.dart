@@ -25,7 +25,7 @@ class CartItem {
       productName: productDoc['productName'],
       productPrice: productDoc['price'].toDouble(),
       productImageUrl: productDoc['imageUrl'],
-      quantity: cartDoc['quantity'] ?? 1,
+      quantity: cartDoc['quantity'],
     );
   }
 
@@ -36,7 +36,6 @@ class CartItem {
       'productPrice': productPrice,
       'quantity': quantity,
       'productImageUrl': productImageUrl,
-      // Add any other fields you need
     };
   }
 
@@ -62,14 +61,12 @@ class CartService {
         .where('userId', isEqualTo: userId)
         .get();
 
-    for (QueryDocumentSnapshot<Map<String, dynamic>> cartDoc
-        in cartSnapshot.docs) {
+    for (QueryDocumentSnapshot<Map<String, dynamic>> cartDoc in cartSnapshot.docs) {
       // Fetch product details from the Products collection
-      DocumentSnapshot<Map<String, dynamic>> productDoc =
-          await FirebaseFirestore.instance
-              .collection('Products')
-              .doc(cartDoc['productId'])
-              .get();
+      DocumentSnapshot<Map<String, dynamic>> productDoc = await FirebaseFirestore.instance
+          .collection('Products')
+          .doc(cartDoc['productId'])
+          .get();
 
       // Check if the product exists in the Products collection
       if (productDoc.exists) {
