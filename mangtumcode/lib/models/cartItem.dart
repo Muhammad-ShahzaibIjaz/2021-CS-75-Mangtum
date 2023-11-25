@@ -25,7 +25,7 @@ class CartItem {
       productName: productDoc['productName'],
       productPrice: productDoc['price'].toDouble(),
       productImageUrl: productDoc['imageUrl'],
-      quantity: cartDoc['quantity'],
+      quantity: productDoc['quantity'],
     );
   }
 
