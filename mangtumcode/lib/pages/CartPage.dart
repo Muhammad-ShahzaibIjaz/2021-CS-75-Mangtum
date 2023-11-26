@@ -43,9 +43,13 @@ class _CartPageState extends State<CartPage> {
 
 
   void _loadCartItems() async {
+    try {
+      List<CartItem> items = await CartService.fetchCartItems(widget.userId);
 
-    CartService.fetchCartItems(widget.userId).then((items) {
-      // Use the items list here
+      setState(() {
+        cartItems = items;
+      });
+
       for (CartItem item in items) {
         print(item.productId);
         print(item.productName);
@@ -53,9 +57,12 @@ class _CartPageState extends State<CartPage> {
         print(item.productImageUrl);
         print(item.quantity);
       }
-    });
-
+    } catch (e) {
+      print('Error loading cart items: $e');
+      // Handle the error accordingly.
+    }
   }
+
 
   @override
 
